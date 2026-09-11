@@ -1,151 +1,142 @@
-# Insider Threat Detection Using Behavioral and Forensic Analysis of Enterprise Activity Logs
+# 🕵️‍♂️ Hybrid Insider Threat Detection System
 
-## Overview
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Data Forensics](https://img.shields.io/badge/Cybersecurity-Data_Forensics-red.svg)](#)
+[![Machine Learning](https://img.shields.io/badge/Machine_Learning-Isolation_Forest-green.svg)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This project performs **forensic analysis of enterprise user activity logs** to identify potential insider threats. It implements a **hybrid detection approach** combining rule-based forensic analysis with machine learning (Isolation Forest) anomaly detection.
+An end-to-end data forensics and behavioral analysis pipeline designed to detect malicious insider activity within enterprise environments. 
 
-### Central Research Question
+By combining **Rule-Based Heuristics** with **Unsupervised Machine Learning (Isolation Forest)**, this system analyzes over 15+ GB of simulated enterprise logs to identify data exfiltration, lateral movement, and suspicious behavioral deviations.
 
+---
+
+## 🌟 Key Highlights
+* **Big Data Processing:** Engineered to handle massive datasets (14.5+ GB HTTP logs) using chunking and memory-efficient `pandas` pipelines.
+* **Behavioral Profiling:** Extracts 15 unique behavioral features per user (e.g., after-hours logins, USB-to-file temporal correlations, external email attachments).
+* **Hybrid Detection Engine:** Balances a proprietary 0-100 risk scoring algorithm (60% weight) with ML-based Isolation Forest anomaly scores (40% weight) to minimize false positives.
+* **Forensic Evidence Chains:** Automatically reconstructs a chronological timeline of malicious events for high-risk users, making it easy for non-technical stakeholders to understand the threat.
+
+---
+
+## 🎯 Central Research Question
 > *"Can behavioral patterns extracted from enterprise activity logs be used to identify anomalous user activity indicative of potential insider threats?"*
 
-### Sub-Questions
-
-- **RQ1:** What does normal employee behavior look like?
-- **RQ2:** What behavioral changes are associated with known malicious users?
-- **RQ3:** Which activity features are strongest indicators of insider threats?
-- **RQ4:** Can users be assigned a forensic risk score based on these indicators?
-
 ---
 
-## Dataset
+## 📊 The Dataset
 
-This project uses the **CERT Insider Threat Dataset** from Carnegie Mellon University's Software Engineering Institute.
+This project utilizes the **CERT Insider Threat Dataset** from Carnegie Mellon University's Software Engineering Institute.
 
-**Download:** [CMU Figshare Repository](https://doi.org/10.1184/R1/12841247.v1)
-
-Recommended version: **r4.2** or **r5.2**
+* **Download:** [CMU Figshare Repository](https://doi.org/10.1184/R1/12841247.v1) (Recommended: version `r4.2` or `r5.2`)
 
 ### Required Files
+Place the following CSV files in the `data/raw/` directory:
 
-Place the following CSV files in `data/raw/`:
-
-| File | Description |
-|------|-------------|
-| `logon.csv` | User login/logout events |
-| `file.csv` | File access operations |
-| `email.csv` | Email activity |
-| `http.csv` | Web browsing activity |
-| `device.csv` | USB/removable device events |
+| File | Description | Size (approx) |
+|------|-------------|---------------|
+| `logon.csv` | User login/logout events | 58 MB |
+| `file.csv` | File access & modification operations | 193 MB |
+| `email.csv` | Internal and external email activity | 1.3 GB |
+| `http.csv` | Web browsing activity | 14.5 GB |
+| `device.csv` | USB / removable device connection events | 28 MB |
 
 ---
 
-## Setup
+## ⚙️ Setup & Installation
 
-### 1. Install Dependencies
+### 1. Clone the repository
+```bash
+git clone https://github.com/Puravgoyal/insider-threat-detection.git
+cd insider-threat-detection
+```
 
+### 2. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Place Dataset
-
-Download the CERT dataset and extract the CSV files into `data/raw/`.
-
 ### 3. Run the Analysis
-
-Open and run the main notebook:
-
+Launch the Jupyter Notebook to walk through the entire pipeline step-by-step:
 ```bash
 jupyter notebook notebooks/insider_threat_analysis.ipynb
 ```
 
 ---
 
-## Project Structure
+## 🧠 Methodology Pipeline
 
+```mermaid
+graph LR
+    A[CERT Dataset] --> B[Data Cleaning]
+    B --> C[Behavioral Profiling]
+    C --> D[Feature Engineering]
+    D --> E[Isolation Forest ML]
+    D --> F[Rule-Based Heuristics]
+    E --> G[Hybrid Risk Scoring]
+    F --> G
+    G --> H[Forensic Timeline Reconstruction]
 ```
-insider-threat-project/
+
+### Risk Level Thresholds
+| Score | Threat Level | Action Required |
+|-------|--------------|-----------------|
+| `0–30`  | 🟢 **LOW** | Normal activity. No action required. |
+| `31–60` | 🟡 **MEDIUM** | Slight deviation. Monitor for future spikes. |
+| `61–80` | 🟠 **HIGH** | Suspicious. Trigger automated forensic timeline review. |
+| `81–100`| 🔴 **CRITICAL**| Highly malicious. Immediate SOC intervention required. |
+
+---
+
+## 🔍 Key Behavioral Features Analyzed
+
+1. **Temporal Anomalies:** After-hours login ratio, weekend login ratio, night activity ratio.
+2. **Exfiltration Indicators:** USB connection frequency, USB-to-file temporal correlation, external emails with attachments.
+3. **Lateral Movement:** Unique PC usage per user.
+4. **Volume Spikes:** File access deviation score (identifying sudden mass-downloads).
+5. **Web Traffic:** Connections to suspicious or unauthorized domains.
+
+---
+
+## 📁 Project Structure
+
+```text
+insider-threat-detection/
 ├── data/
-│   ├── raw/                    # Place CERT CSV files here
-│   └── processed/              # Cleaned data (auto-generated)
+│   ├── raw/                    # Place raw CERT CSV files here
+│   └── processed/              # Cleaned datasets (auto-generated)
 ├── src/
-│   ├── __init__.py
-│   ├── config.py               # Project constants & paths
-│   ├── data_loader.py          # Load and inspect raw CSVs
+│   ├── config.py               # Project constants, weights, & paths
+│   ├── data_loader.py          # Handles chunked loading of 15GB files
 │   ├── preprocessing.py        # Data cleaning & normalization
-│   ├── baseline_profiling.py   # Normal behavior profiles
-│   ├── feature_engineering.py  # Behavioral feature extraction
-│   ├── anomaly_detection.py    # Isolation Forest implementation
-│   ├── risk_scoring.py         # Hybrid rule + ML scoring
-│   ├── forensic_investigation.py  # Timeline reconstruction
-│   └── visualizations.py       # All forensic visualizations
+│   ├── baseline_profiling.py   # Establishes normal behavior baselines
+│   ├── feature_engineering.py  # Extracts the 15 behavioral features
+│   ├── anomaly_detection.py    # Scikit-Learn Isolation Forest implementation
+│   ├── risk_scoring.py         # Hybrid rule + ML scoring engine
+│   ├── forensic_investigation.py# Evidence chain timeline reconstruction
+│   └── visualizations.py       # Matplotlib & Seaborn charting
 ├── notebooks/
-│   └── insider_threat_analysis.ipynb   # Main walkthrough
+│   └── insider_threat_analysis.ipynb   # Main interactive walkthrough
 ├── output/
-│   ├── figures/                # Saved visualization PNGs
+│   ├── figures/                # Saved visualization PNGs (Activity, Heatmaps, etc.)
 │   ├── reports/                # Generated forensic reports
-│   └── risk_scores.csv         # Final risk score table
+│   └── risk_scores.csv         # Final computed risk score table
 ├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Methodology Pipeline
+## 🛠️ Tech Stack
 
-```
-CERT Dataset → Data Cleaning → Behavioral Profiling → Feature Engineering
-    → Statistical/Rule-Based Analysis → Isolation Forest
-    → Hybrid Risk Scoring → Forensic Timeline Reconstruction
-```
-
-### Detection Approach
-
-| Component | Description |
-|-----------|-------------|
-| **Rule-Based Analysis** | Weighted scoring of forensic indicators (after-hours activity, USB usage, file anomalies, etc.) |
-| **ML Anomaly Detection** | Isolation Forest trained on 15 behavioral features |
-| **Hybrid Score** | Combined: 60% rule-based + 40% ML anomaly score |
-| **Forensic Investigation** | Timeline reconstruction and evidence chain analysis for top-risk users |
-
-### Risk Levels
-
-| Score | Level |
-|-------|-------|
-| 0–30  | LOW |
-| 31–60 | MEDIUM |
-| 61–80 | HIGH |
-| 81–100 | CRITICAL |
+* **Language:** Python 3.8+
+* **Data Engineering:** Pandas, NumPy
+* **Machine Learning:** Scikit-Learn (Isolation Forest)
+* **Data Visualization:** Matplotlib, Seaborn
+* **Environment:** Jupyter Notebook
 
 ---
 
-## Key Features Analyzed
+## 📜 License & Disclaimer
 
-1. After-hours login ratio
-2. Weekend login ratio
-3. File access deviation (spike detection)
-4. USB connection frequency
-5. USB-file temporal correlation
-6. External email with attachments
-7. Suspicious website visits
-8. Night activity ratio
-9. Unique PC usage (lateral movement)
-10. Behavioral deviation score
-
----
-
-## Technologies
-
-- **Python 3.8+**
-- **pandas** — Data manipulation
-- **numpy** — Numerical computing
-- **matplotlib / seaborn** — Visualizations
-- **scikit-learn** — Isolation Forest
-- **plotly** — Interactive visualizations
-- **Jupyter Notebook** — Analysis walkthrough
-
----
-
-## License
-
-This project is for academic/educational purposes. The CERT Insider Threat Dataset is provided by CMU SEI under their terms of use.
+This project is open-source under the MIT License. It was created for academic and educational purposes to demonstrate User Entity Behavior Analytics (UEBA) and Data Forensics. The CERT Insider Threat Dataset is provided by the CMU Software Engineering Institute under their respective terms of use.
