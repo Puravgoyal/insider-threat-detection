@@ -140,3 +140,10 @@ insider-threat-detection/
 ## 📜 License & Disclaimer
 
 This project is open-source under the MIT License. It was created for academic and educational purposes to demonstrate User Entity Behavior Analytics (UEBA) and Data Forensics. The CERT Insider Threat Dataset is provided by the CMU Software Engineering Institute under their respective terms of use.
+
+---
+
+## Contributors
+
+* Anij Mehta
+* Purav Goyal
